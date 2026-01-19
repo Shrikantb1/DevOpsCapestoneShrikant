@@ -1,0 +1,26 @@
+# Node modules
+node_modules/
+npm-debug.log
+
+# Build outputs
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# JSON data files (optional - comment out if you want to track them)
+products.json
+carts.json
+
+# Angular
+.angular/

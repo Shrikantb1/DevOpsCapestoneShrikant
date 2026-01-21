@@ -25,8 +25,11 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadProducts();
-    this.loadCart();
+    // Only load data in browser, not during SSR/build
+    if (typeof window !== 'undefined') {
+      this.loadProducts();
+      this.loadCart();
+    }
   }
 
   loadProducts() {
@@ -57,7 +60,6 @@ export class AppComponent implements OnInit {
   }
 
   addToCart(product: Product) {
-
     this.cartService.addToCart(product.id, 1).subscribe({
       next: () => {
         this.loadCart();
@@ -65,7 +67,7 @@ export class AppComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error adding to cart:', err);
-        alert('Failed to add item to cart. Please make sure the Cart Service is running.');
+        alert('Failed to add item to cart.');
       }
     });
   }

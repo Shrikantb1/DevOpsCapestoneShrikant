@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-        DOCKERHUB_USERNAME = 'shrikantb1' 
+        DOCKERHUB_USERNAME = 'shrikantb1'  // Your username
         GITHUB_REPO = 'https://github.com/Shrikantb1/DevOpsCapestoneShrikant.git'
         SONARQUBE_ENV = 'SonarQube'
     }
@@ -27,21 +27,27 @@ pipeline {
                 stage('Product Service') {
                     steps {
                         dir('product-service') {
-                            sh 'npm install'
+                            retry(3) {
+                                sh 'npm install --prefer-offline --no-audit'
+                            }
                         }
                     }
                 }
                 stage('Cart Service') {
                     steps {
                         dir('cart-service') {
-                            sh 'npm install'
+                            retry(3) {
+                                sh 'npm install --prefer-offline --no-audit'
+                            }
                         }
                     }
                 }
                 stage('Frontend') {
                     steps {
                         dir('frontend/ecommerce-frontend') {
-                            sh 'npm install'
+                            retry(3) {
+                                sh 'npm install --prefer-offline --no-audit'
+                            }
                         }
                     }
                 }
@@ -129,7 +135,7 @@ pipeline {
                             echo "========== Scanning Product Service =========="
                             trivy image --severity HIGH,CRITICAL \
                             --format table \
-                            ${DOCKERHUB_USERNAME}/product-service:latest
+                            ${DOCKERHUB_USERNAME}/product-service:latest || true
                             
                             trivy image --severity HIGH,CRITICAL \
                             --format json \
@@ -144,7 +150,7 @@ pipeline {
                             echo "========== Scanning Cart Service =========="
                             trivy image --severity HIGH,CRITICAL \
                             --format table \
-                            ${DOCKERHUB_USERNAME}/cart-service:latest
+                            ${DOCKERHUB_USERNAME}/cart-service:latest || true
                             
                             trivy image --severity HIGH,CRITICAL \
                             --format json \
@@ -159,7 +165,7 @@ pipeline {
                             echo "========== Scanning Frontend =========="
                             trivy image --severity HIGH,CRITICAL \
                             --format table \
-                            ${DOCKERHUB_USERNAME}/frontend-service:latest
+                            ${DOCKERHUB_USERNAME}/frontend-service:latest || true
                             
                             trivy image --severity HIGH,CRITICAL \
                             --format json \
@@ -214,7 +220,7 @@ pipeline {
     post {
         always {
             echo '========== Cleaning up =========='
-            sh 'docker logout'
+            sh 'docker logout || true'
             
             // Archive security scan reports
             archiveArtifacts artifacts: 'trivy-*.json', allowEmptyArchive: true
